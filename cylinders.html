@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=utf-8>
+        <title>Tree</title>
+        <style>
+            body { margin: 0; }
+            canvas { width: 100%; height: 100% }
+        </style>
+    </head>
+    <body>
+        <script src="js/three.js"></script>
+        <script src="js/orbitControls.js"></script>
+        <script>
+            // Our Javascript will go here.
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+            var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+            document.body.appendChild( renderer.domElement );
+
+
+            var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+            var material = new THREE.MeshPhongMaterial(
+                { color: 0xf77ccc,
+                }
+            );
+
+            var directionalLight = new THREE.DirectionalLight(0xffffff, .5);
+            directionalLight.position.set( 2, 2, 4 )
+
+            var ambientLight = new THREE.AmbientLight(0xffffff);
+
+            var size = 10;
+            var step = 1;
+
+            var gridHelper = new THREE.GridHelper( size, step );
+            scene.add( gridHelper );
+
+            scene.add( directionalLight );
+            scene.add( ambientLight );
+
+            camera.position.z = 40;
+            // camera.lookAt(new THREE.Vector3(0, 150, 0 ))
+
+            function render() {
+                requestAnimationFrame( render );
+                renderer.render( scene, camera );
+
+                controls.update();
+            }
+
+            function createSegment(){
+                var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+                var height = 10;
+
+                var geometry = new THREE.CylinderGeometry(
+                    5, //top
+                    5, //bottom
+                    height,
+                    10 );
+                var cylinder = new THREE.Mesh( geometry, material );
+
+                cylinder.position.y = height/2;
+
+                scene.add( cylinder );
+
+
+                var geometry2 = new THREE.CylinderGeometry(
+                    3, //top
+                    3, //bottom
+                    height,
+                    10 );
+                var cylinder2 = new THREE.Mesh( geometry2, material );
+
+                cylinder2.position.y = height/2;
+                cylinder2.position.x = 8;
+                cylinder2.rotateZ(Math.PI/4*3)
+                //cylinder2.rotateY(Math.PI/4)
+                // cylinder2.rotateX(Math.PI/4)
+                // cylinder2.rotateY(Math.PI/4)
+                // cylinder2.rotateZ(Math.PI/2)
+                // cylinder2.rotateX(Math.PI/2)
+                // cylinder2.rotateZ(Math.PI/180*20)
+
+                // var euler = new THREE.Euler(0, Math.PI, 0, 'XYZ');
+
+                // cylinder2.translateOnAxis(new THREE.Vector3(1,0,0).applyEuler(euler), height)
+                // cylinder2.rotateZ()
+
+                scene.add( cylinder2 );
+
+
+            }
+
+            createSegment();
+
+            render();
+        </script>
+    </body>
+</html>
