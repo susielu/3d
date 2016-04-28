@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=utf-8>
+        <title>My first Three.js app</title>
+        <style>
+            body { margin: 0; }
+            canvas { width: 100%; height: 100% }
+        </style>
+    </head>
+    <body>
+        <script src="js/three.js"></script>
+        <script src="js/orbitControls.js"></script>
+        <script>
+            // Our Javascript will go here.
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+            var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+            document.body.appendChild( renderer.domElement );
+
+
+            var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+            var material = new THREE.MeshPhongMaterial(
+                { color: 0xf77ccc,
+                }
+            );
+
+            var directionalLight = new THREE.DirectionalLight(0xffffff, .5);
+            directionalLight.position.set( 2, 2, 4 )
+
+            var ambientLight = new THREE.AmbientLight(0xffffff);
+
+            var cube = new THREE.Mesh( geometry, material );
+
+            var size = 10;
+            var step = 1;
+
+            var gridHelper = new THREE.GridHelper( size, step );
+            scene.add( gridHelper );
+
+            scene.add( cube );
+            scene.add( directionalLight );
+            scene.add( ambientLight );
+
+            camera.position.z = 15;
+
+            function render() {
+                requestAnimationFrame( render );
+                renderer.render( scene, camera );
+
+                // cube.rotation.x += 0.01;
+                // cube.rotation.y += 0.01;
+                // cube.rotation.z += 0.01;
+
+                controls.update();
+            }
+
+            render();
+        </script>
+    </body>
+</html>
