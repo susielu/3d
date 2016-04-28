@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=utf-8>
+        <title>Tree</title>
+        <style>
+            body { margin: 0; }
+            canvas { width: 100%; height: 100% }
+        </style>
+    </head>
+    <body>
+        <script src="js/three.js"></script>
+        <script src="js/orbitControls.js"></script>
+        <script>
+            // Our Javascript will go here.
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+            var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+            document.body.appendChild( renderer.domElement );
+
+
+            var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+            var material = new THREE.MeshPhongMaterial(
+                { color: 0xf77ccc,
+                }
+            );
+
+            var directionalLight = new THREE.DirectionalLight(0xffffff, .5);
+            directionalLight.position.set( 2, 2, 4 )
+
+            var ambientLight = new THREE.AmbientLight(0xffffff);
+
+            var size = 10;
+            var step = 1;
+
+            var gridHelper = new THREE.GridHelper( size, step );
+            scene.add( gridHelper );
+
+            scene.add( directionalLight );
+            scene.add( ambientLight );
+
+            camera.position.z = 50;
+            camera.position.y = 80;
+            // camera.lookAt(new THREE.Vector3(0, 150, 0 ))
+
+            function render() {
+                requestAnimationFrame( render );
+                renderer.render( scene, camera );
+
+                controls.update();
+            }
+
+
+            var treeData = [{
+                branches: 2,
+                leaves: 200,
+                initialRadius: 5,
+                sizeReduction: .8,
+                x: 0,
+                z: 0
+            },
+            {
+                branches: 2,
+                leaves: 200,
+                initialRadius: 3,
+                sizeReduction: .5,
+                x: 10,
+                z: -10
+            }]
+
+            function createSegment(x, y, z, sizeReduction, radiusStart, branches, min, max, rotateX, rotateY, rotateZ){
+                var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+                var height = Math.random()*(max - min) + min
+                var topRadius = radiusStart*sizeReduction;
+
+                var geometry = new THREE.CylinderGeometry(
+                    topRadius,
+                    radiusStart,
+                    height,
+                    10 );
+                var cylinder = new THREE.Mesh( geometry, material );
+
+                if (rotateX && rotateY && rotateZ){
+                  console.log("in rotating", rotateX, rotateY, rotateZ, x + height/2*Math.tan(rotateX), z, height/2, Math.tan(rotateZ), z + height/2*Math.tan(rotateZ))
+
+                    var euler = new THREE.Euler(rotateX, rotateY, rotateZ, 'XYZ');
+
+                    cylinder.translateOnAxis(new THREE.Vector3(0,1,0).applyEuler(euler), height/2)
+
+                    cylinder.rotateX(rotateX)
+                    cylinder.rotateY(rotateY)
+                    cylinder.rotateZ(rotateZ)
+
+                    // cylinder.translateOnAxis( new THREE.Vector3(0,1,0).applyAxisAngle(
+                    //     new THREE.Vector3(1,0,0), rotateX
+                    //     ), height/2)
+                    cylinder.position.x = x;
+                    cylinder.position.z = z;
+                    cylinder.position.y = y;
+
+                } else {
+                    cylinder.position.x = x;
+                    cylinder.position.z = z;
+                    cylinder.position.y = y + height/2;
+                }
+
+
+                // }
+
+                scene.add( cylinder );
+
+                // if (topRadius > .5){
+
+                    if (branches !== 0){
+                    createSegment(
+                        x,
+                        y + height,
+                        z,
+                        sizeReduction,
+                        topRadius,
+                        branches - 1,
+                        4,
+                        6
+                        )
+
+                    createSegment(
+                        x + height/2*Math.tan((rotateX || 0)),
+                        y + height,
+                        z + height/2*Math.tan((rotateZ || 0)),
+                        sizeReduction,
+                        topRadius,
+                        branches - 1,
+                        4,
+                        6,
+                        (rotateX || 0) + THREE.Math.degToRad(20),
+                        (rotateY || 0) + THREE.Math.degToRad(20),
+                        (rotateZ || 0) + THREE.Math.degToRad(20)
+                        )
+                    }
+
+                    // else {
+
+                    // createSegment(
+                    //     x,
+                    //     y + height,
+                    //     z,
+                    //     sizeReduction,
+                    //     topRadius,
+                    //     branches,
+                    //     4,
+                    //     6
+                    //     )
+                    // }
+
+                // }
+            }
+
+
+
+            function renderTree(singleTree){
+
+                createSegment(singleTree.x,
+                    0,
+                    singleTree.z,
+                    singleTree.sizeReduction,
+                    singleTree.initialRadius,
+                    singleTree.branches,
+                    4,
+                    6
+                    )
+
+            }
+
+            treeData.forEach(function(t){ renderTree(t); });
+
+            render();
+        </script>
+    </body>
+</html>
