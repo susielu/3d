@@ -1,6 +1,6 @@
 import { createLeaf }            from './leaf-creator'
 
-const createSegment = function ({ lengthProducer, materials, scene, segment, minimumRadius }) {
+const createSegment = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold }) {
 
   if (segment.radius < minimumRadius) {
     return;
@@ -22,6 +22,16 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
     length,
     10
   );
+
+  if (segment.radius < leafThreshold){
+    createLeaf({
+      scene,
+      position: localPosition,
+      rotation: segment.rotation,
+      length,
+      bottomRadius: segment.radius,
+      topRadius})
+  }
 
   let cylinder = new THREE.Mesh(geometry, material);
   cylinder.position.x = localPosition.x;
@@ -49,7 +59,7 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
 
   newRecursiveSegment.position.add(updateVector);
 
-  createSegment({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius });
+  createSegment({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius, leafThreshold });
 
   if (Math.random() < newRecursiveSegment.branchProbability) {
 
@@ -62,7 +72,7 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
     newBranchSegment.rotation.normalize();
 
     // TODO: update position due to rotation effects here?
-    createSegment({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius });
+    createSegment({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold });
   }
 }
 

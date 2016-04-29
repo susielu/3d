@@ -61,7 +61,8 @@ const initializeEachSegment = segments => {
       materials      : createMaterialListFromColorList(ColorLists.BlueToPink),
       scene,
       segment,
-      minimumRadius  : 0.3
+      minimumRadius  : 0.3,
+      leafThreshold  : 1
     })
   })
 
