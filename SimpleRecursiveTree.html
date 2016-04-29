@@ -59,9 +59,10 @@
 
             scene.add( ambientLight );
 
-            camera.position.z = 50;
-            camera.position.y = 80;
-            // camera.lookAt(new THREE.Vector3(0, 150, 0 ))
+            camera.position.z = 150;
+
+            // changes focal point of camera
+            controls.target = new THREE.Vector3(0, 50, 0 )
 
             function render() {
                 requestAnimationFrame( render );
@@ -104,7 +105,7 @@
               var materialIndex = Math.floor(treeSegment.radius);
               var material = materials[materialIndex];
               var topRadius = treeSegment.radius * treeSegment.sizeReduction;
-              console.log("radius old, new", treeSegment.radius, topRadius);
+              // console.log("radius old, new", treeSegment.radius, topRadius);
               var length = lengthFunction();
 
               var geometry = new THREE.CylinderGeometry(
@@ -139,7 +140,7 @@
               updateVector.multiplyScalar(length);
 
               newRecursiveSegment.position.add(updateVector);
-              console.log("newrec pos", newRecursiveSegment.position);
+              // console.log("newrec pos", newRecursiveSegment.position);
 
               createSegment(newRecursiveSegment);
 
@@ -156,6 +157,8 @@
                 createSegment(newBranchSegment);
               }
             }
+
+            console.log('camera data', camera.toJSON())
 
             function renderTree(singleTree){
                 createSegment(singleTree)
