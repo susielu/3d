@@ -22,18 +22,25 @@
             var scene = new THREE.Scene();
             var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-            var min = 4, max = 6;
+            var min = 2, max = 6;
+            var minRadius = 0.3;
 
             var lengthFunction = lengthChooser(min, max);
-
-            var materials = [
-              new THREE.MeshPhongMaterial( { color: "#feb24c"}),
-              new THREE.MeshPhongMaterial( { color: "#fd8d3c"}),
-              new THREE.MeshPhongMaterial( { color: "#fc4e2a"}),
-              new THREE.MeshPhongMaterial( { color: "#e31a1c"}),
-              new THREE.MeshPhongMaterial( { color: "#bd0026"}),
-              new THREE.MeshPhongMaterial( { color: "#800026"})
+            var colorList = [
+              "#00441b",
+              "#006d2c",
+              "#238b45",
+              "#41ab5d",
+              "#74c476",
+              "#a1d99b",
+              "#c7e9c0",
+              "#e5f5e0"
             ];
+
+            var materials = colorList.map(function(col) {
+              return new THREE.MeshPhongMaterial( {color: col});
+            });
+
 
             var renderer = new THREE.WebGLRenderer();
             renderer.setSize( window.innerWidth, window.innerHeight );
@@ -64,23 +71,28 @@
             }
 
             var treeData = [{
-                radius: 5,
-                sizeReduction: .9,
-                branchProbability: 0.1,
-                position: new THREE.Vector3(0,0,0),
+                radius: 6,
+                sizeReduction: .85,
+                branchProbability: 0.12,
+                position: new THREE.Vector3(0, 0, 0),
                 rotation: new THREE.Vector3(0, 1, 0)
             }, {
                 radius: 3,
-                sizeReduction: .7,
-                branchProbability: 0.2,
+                sizeReduction: .87,
+                branchProbability: 0.25,
                 position: new THREE.Vector3(10, 0, -10),
+                rotation: new THREE.Vector3(0,  1,  0)
+            }, {
+                radius: 7,
+                sizeReduction: .82,
+                branchProbability: 0.22,
+                position: new THREE.Vector3(10, 0, 10),
                 rotation: new THREE.Vector3(0,  1,  0)
             }];
 
             function createSegment(treeSegment) {
 
-              console.log("should I add this? radius: ", treeSegment.radius);
-              if (treeSegment.radius < 0.2) {
+              if (treeSegment.radius < minRadius) {
                 return;
               }
 
@@ -92,10 +104,8 @@
               var materialIndex = Math.floor(treeSegment.radius);
               var material = materials[materialIndex];
               var topRadius = treeSegment.radius * treeSegment.sizeReduction;
+              console.log("radius old, new", treeSegment.radius, topRadius);
               var length = lengthFunction();
-              var newRecursiveSegment = Object.assign({}, treeSegment);
-              newRecursiveSegment.position = localPosition;
-              newRecursiveSegment.rotation = localRotation;
 
               var geometry = new THREE.CylinderGeometry(
                 topRadius,
@@ -105,21 +115,20 @@
               );
 
               var cylinder = new THREE.Mesh(geometry, material);
-              cylinder.position.x = treeSegment.position.x;
-              cylinder.position.y = treeSegment.position.y;
-              cylinder.position.z = treeSegment.position.z;
+              cylinder.position.x = localPosition.x;
+              cylinder.position.y = localPosition.y;
+              cylinder.position.z = localPosition.z;
 
               cylinder.rotation.x = treeSegment.rotation.x;
               cylinder.rotation.y = treeSegment.rotation.y;
               cylinder.rotation.z = treeSegment.rotation.z;
 
-              console.log("adding with rotation", treeSegment.rotation.x, treeSegment.rotation.y);
               scene.add(cylinder);
 
+              var newRecursiveSegment = Object.assign({}, treeSegment);
               newRecursiveSegment.radius = topRadius;
-
-              console.log("current y", newRecursiveSegment.position.y);
-              console.log("current x", newRecursiveSegment.position.x);
+              newRecursiveSegment.position = localPosition;
+              newRecursiveSegment.rotation = localRotation;
 
               var updateVector = new THREE.Vector3(0,1,0);
               var rotationMatrix = new THREE.Matrix4();
@@ -127,20 +136,23 @@
               euler.setFromVector3(newRecursiveSegment.rotation, 'XYZ');
               rotationMatrix.makeRotationFromEuler(euler);
               updateVector.transformDirection(rotationMatrix);
+              updateVector.multiplyScalar(length);
 
               newRecursiveSegment.position.add(updateVector);
-              console.log("new y", newRecursiveSegment.position.y, "length", length);
+              console.log("newrec pos", newRecursiveSegment.position);
 
               createSegment(newRecursiveSegment);
 
               if (Math.random() < newRecursiveSegment.branchProbability) {
-                console.log("WE GOT A BRANCH OMG");
 
                 var newBranchSegment = Object.assign({}, treeSegment);
                 newBranchSegment.position = localPosition;
                 newBranchSegment.rotation = localRotation;
-                newBranchSegment.rotation.x += Math.random();
+                newBranchSegment.rotation.x += Math.random() - 0.5;
+                newBranchSegment.rotation.y += Math.random() - 0.5;
+                newBranchSegment.rotation.z += Math.random() - 0.5;
                 newBranchSegment.rotation.normalize();
+                // TODO: update position due to rotation effects here?
                 createSegment(newBranchSegment);
               }
             }
