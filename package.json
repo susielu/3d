@@ -1,6 +1,6 @@
 {
   "name": "3d-recursive-plantae",
-  "version": "1.0.0-experimental.2",
+  "version": "1.0.0-experimental.3",
   "description": "An exploration of how a plant's branching patterns makes it unique",
   "private": true,
   "main": "index.js",
