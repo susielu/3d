@@ -26,19 +26,33 @@
             var minRadius = 0.3;
 
             var lengthFunction = lengthChooser(min, max);
-            var colorList = [
-              "#00441b",
-              "#006d2c",
-              "#238b45",
-              "#41ab5d",
-              "#74c476",
-              "#a1d99b",
-              "#c7e9c0",
-              "#e5f5e0"
-            ];
+            // var colorList = [
+            //   "#00441b",
+            //   "#006d2c",
+            //   "#238b45",
+            //   "#41ab5d",
+            //   "#74c476",
+            //   "#a1d99b",
+            //   "#c7e9c0",
+            //   "#e5f5e0"
+            // ];
 
-            var materials = colorList.map(function(col) {
-              return new THREE.MeshPhongMaterial( {color: col});
+            var colorList = [
+              { color: "#4c0e5f", emissive: "755a1b"}
+
+            ]
+
+            // var materials = colorList.map(function(col) {
+            //   return new THREE.MeshPhongMaterial( {color: col});
+            // });
+
+            var materials = colorList.map(function(c) {
+              return new THREE.MeshStandardMaterial( {
+                color: c.color,
+                emissive: c.emissive,
+                roughness: 1,
+                metalness: 0
+              });
             });
 
 
