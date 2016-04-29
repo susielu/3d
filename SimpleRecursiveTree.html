@@ -12,39 +12,55 @@
     <body>
         <script src="js/three.js"></script>
         <script src="js/orbitControls.js"></script>
+        <script src="js/SkyShader.js"></script>
+        <script type="x-shader/x-vertex" id="vertexShader">
+              varying vec3 vWorldPosition;
+              void main() {
+                vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+                vWorldPosition = worldPosition.xyz;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+              }
+        </script>
+
+        <script type="x-shader/x-fragment" id="fragmentShader">
+              uniform vec3 topColor;
+              uniform vec3 bottomColor;
+              uniform float offset;
+              uniform float exponent;
+              varying vec3 vWorldPosition;
+              void main() {
+                float h = normalize( vWorldPosition + offset ).y;
+                gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
+              }
+        </script>
         <script>
             'use strict';
 
             const lengthChooser = (min, max) => () => Math.random()*(max - min) + min;
 
             var scene = new THREE.Scene();
-            // scene.fog = new THREE.Fog( "#cce0ff", 500, 10000 );
+            // scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
-            var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000000 );
             camera.position.z = 250;
             camera.position.y = 40;
+            camera.focus = 100;
 
             var renderer = new THREE.WebGLRenderer();
             renderer.setSize( window.innerWidth, window.innerHeight );
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMapType = THREE.PCFSoftShadowMap;
-            // renderer.gammaInput = true;
-            // renderer.gammaOutput = true;
-            // renderer.antialias = true;
 
+            //to make a solid sky
+            // renderer.setClearColor( '#082f85' );
+
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.appendChild( renderer.domElement );
 
             var controls = new THREE.OrbitControls( camera, renderer.domElement );
             // changes focal point of camera
             controls.target = new THREE.Vector3( 0, 80, 0 )
 
-
-            // var gridHelper = new THREE.GridHelper( 200, 10 ); //size and step
-            // scene.add( gridHelper );
-
-            var ground = new THREE.PlaneBufferGeometry( 2000, 2000 );
-            // var groundMaterial = new THREE.MeshBasicMaterial( {color: "#42e873", side: THREE.DoubleSide} );
-
+            var ground = new THREE.PlaneBufferGeometry( 7000, 7000 );
             var groundMaterial = new THREE.MeshStandardMaterial( {
                   color: "#07b63a",
                   emissive: "#343991",
@@ -53,74 +69,43 @@
                   emissiveIntensity: 1
                 })
             var plane = new THREE.Mesh( ground, groundMaterial );
-
-            // plane.position.y = - 250;
             plane.rotation.x = - Math.PI / 2;
             plane.receiveShadow = true;
             scene.add( plane );
 
+            // var spotlight = new THREE.SpotLight("#fff9b5");
+            var spotlight = new THREE.SpotLight("pink");
 
-            // Lights
-            // var lights = [];
-            // lights[ 0 ] = new THREE.PointLight( "#fff", 1, 0 );
-            // lights[ 1 ] = new THREE.PointLight( "#fff", 1, 0 );
-            // lights[ 2 ] = new THREE.PointLight( "#fff", 1, 0 );
+            spotlight.position.set(200, 200, 40);
+            spotlight.castShadow = true;
+            spotlight.angle = 1;
+            spotlight.exponent = 10.0;
+            spotlight.penumbra = 0.1;
+            spotlight.decay = .1;
+            spotlight.distance = 1000;
+            spotlight.shadow.mapSize.width = 1024;
+            spotlight.shadow.mapSize.height = 1024;
 
-            // lights[ 0 ].position.set( 0, 300, 0 );
-            // lights[ 1 ].position.set( 300, 300, 200 );
-            // lights[ 2 ].position.set( -200, -500, -200 );
+            scene.add( spotlight );
 
-            // lights.map(l => {
-            //   l.castShadow = true;
-            //   // l.shadowDarkness = .5;
-            //   return l
-            // })
+            var vertexShader = document.getElementById( 'vertexShader' ).textContent;
+            var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+            var uniforms = {
+              topColor:    { type: "c", value: new THREE.Color( "black" ) },
+              bottomColor: { type: "c", value: new THREE.Color( "#343991" ) },
+              offset:    { type: "f", value: 33 },
+              exponent:  { type: "f", value: 0.6 }
+            };
 
-            // // scene.add( lights[ 0 ] );
-            // scene.add( lights[ 1 ] );
-            // //scene.add( lights[ 2 ] );
-
-            var light = new THREE.DirectionalLight("#4444cc", 1)
-              light.position.set( 100, 100, 1 ).normalize();
-
-              scene.add( light );
-            // var spt = new THREE.SpotLight(0xFFFFFF);
-            var spt = new THREE.SpotLight("#fff9b5");
-
-            spt.position.set(200, 200, 40);
-            spt.castShadow = true;
-            spt.angle = 0.75;
-            spt.exponent = 10.0;
-            spt.penumbra = 0.1;
-            spt.decay = 1;
-            spt.distance = 1000;
-            spt.shadow.mapSize.width = 1024;
-            spt.shadow.mapSize.height = 1024;
-            // shadow camera helper
-            spt.shadowCameraHelper = new THREE.CameraHelper( spt.shadow.camera ); // colored lines
-            spt.shadow.camera.near = 0.1;
-            spt.shadow.camera.far = 20000;
-
-            // var spotLight = new THREE.SpotLight( "white", 10, 100 );
-
-            // spotLight.position.set( 100, 1000, 100 );
-
-            // spotLight.castShadow = true;
-
-            // spotLight.shadow.mapSize.width = 1024;
-            // spotLight.shadow.mapSize.height = 1024;
-
-            // spotLight.shadow.camera.near = 500;
-            // spotLight.shadow.camera.far = 4000;
-            // spotLight.shadow.camera.fov = 30;
-            //  // spotLight.target.position.set( 100, 100, 1 );
-            //   // spotLight.shadowCameraNear  = 0.01;
-            //   // spotLight.castShadow    = true;
-
-            //   // spotLight.shadowDarkness  = 0.5;
-            //   // spotLight.shadowCameraVisible = true;
-
-            scene.add( spt );
+            var skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
+            var skyMat = new THREE.ShaderMaterial(
+              { vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
+                uniforms: uniforms,
+                side: THREE.BackSide
+            });
+            var sky = new THREE.Mesh( skyGeo, skyMat );
+            scene.add( sky );
 
             //Colors
             var colorList = {
@@ -212,14 +197,14 @@
             },{
                 radius: 7,
                 sizeReduction: .92,
-                branchProbability: 0.1,
+                branchProbability: 0.18,
                 position: new THREE.Vector3(-15, 0, 15),
                 rotation: new THREE.Vector3(0,  1,  0),
                 color: 'pink'
             },{
                 radius: 10,
                 sizeReduction: .75,
-                branchProbability: 0.28,
+                branchProbability: 0.3,
                 position: new THREE.Vector3(-20, 0, -15),
                 rotation: new THREE.Vector3(0,  1,  0),
                 color: 'pink'
