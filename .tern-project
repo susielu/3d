@@ -1,0 +1,10 @@
+{
+  "libs": [ "browser" ],
+  "loadEagerly": [
+    "./src/*.js",
+    "./src/plantae/*.js"
+  ],
+  "plugins": {
+    "node": { }
+  }
+}
