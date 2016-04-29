@@ -24,15 +24,18 @@ const camera =
     ( 45, window.innerWidth / window.innerHeight, 0.1, 2000000 )
 
 let renderer = createRendererForWindow() // `let` instead of `const` for reloading
+renderer.shadowMap.endabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const focalPoint = [ 0, 80, 0 ]
 const controls = createCameraControlsWithFocalPoint(camera, renderer, focalPoint)
 
 
 const plane = createPlane({
-  mesh      : { color : 'blue' },
+  mesh      : { color : "#07b63a", emissive: "#343991" },
   geometry  : { width : 7000, height : 7000 }
 })
+
 scene.add(plane)
 
 

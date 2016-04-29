@@ -57,9 +57,15 @@ export const createOverrideContructor =  createOverrideForReadOnlyContructor
 
 export const createPlane = ({ mesh, geometry }) => {
   const ground         = new THREE.PlaneBufferGeometry( geometry.width, geometry.height );
-  const groundMaterial = new THREE.MeshBasicMaterial( { color : mesh.color, side : mesh.side || THREE.DoubleSide } );
+  const groundMaterial = new THREE.MeshStandardMaterial( {
+      color: mesh.color,
+      emissive: mesh.emissive,
+      roughness: 1,
+      metalness: 0,
+      emissiveIntensity: 1
+    } );
 
-  return createOverrideContructor( THREE.Mesh, { rotation : { x : Math.PI / 2 }, receiveShadow : true } )
+  return createOverrideContructor( THREE.Mesh, { rotation : { x : - Math.PI / 2 }, receiveShadow : true } )
       ( ground, groundMaterial )
 }
 

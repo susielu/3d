@@ -1,6 +1,6 @@
 const Pink = { };
 
-Pink.color      = 'pink';
+Pink.color      = 'white';
 Pink.position   = [ 200, 200, 40 ];
 Pink.castShadow = true;
 Pink.angle      = 1;
