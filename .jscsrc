@@ -1,0 +1,31 @@
+{
+  "disallowEmptyBlocks": true,
+  "disallowImplicitTypeConversion": ["string"],
+  "disallowKeywords": ["with"],
+  "disallowKeywordsOnNewLine": ["else"],
+  "disallowMixedSpacesAndTabs": true,
+  "disallowNodeTypes": ["LabeledStatement"],
+  "disallowQuotedKeysInObjects": true,
+  "esnext": true,
+  "excludeFiles": [ "src/orbitControls.js", "src/three.js" ],
+  "requireCapitalizedConstructors": true,
+  "requireDotNotation": true,
+  "requireObjectKeysOnNewLine": { "allExcept": ["sameLine"] },
+  "requirePaddingNewLinesAfterBlocks": true,
+  "requirePaddingNewLinesBeforeExport": true,
+  "requireSpaceAfterKeywords": ["if", "else", "for", "while", "do", "switch", "return", "try", "catch"],
+  "requirePaddingNewlinesBeforeKeywords": [
+    "do",
+    "for",
+    "if",
+    "switch",
+    "case",
+    "try",
+    "catch",
+    "void",
+    "while",
+    "with",
+    "return"
+  ],
+  "validateParameterSeparator": ", "
+}
