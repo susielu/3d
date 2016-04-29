@@ -7,7 +7,7 @@
   "disallowNodeTypes": ["LabeledStatement"],
   "disallowQuotedKeysInObjects": true,
   "esnext": true,
-  "excludeFiles": [],
+  "excludeFiles": [ "src/orbitControls.js", "src/three.js" ],
   "requireCapitalizedConstructors": true,
   "requireCurlyBraces": ["while", "do", "try", "catch"],
   "requireDotNotation": true,

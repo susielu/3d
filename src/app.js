@@ -1,27 +1,24 @@
-function lengthChooser(min, max) {
-  return function() { return Math.random()*(max - min) + min; };
-}
+import { createLengthChooserWithMinAndMax } from './higher-order'
+import {
+  createOverrideForReadOnlyContructor,
+  createCameraControlsWithFocalPoint,
+  createRendererForWindow                 } from './genesis'
 
-let scene = new THREE.Scene();
+const scene = new THREE.Scene();
 
-let camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.z = 250;
-camera.position.y = 40;
+const camera =
+  // `PerspectiveCamera.position` is read only but it's fields `y` and `z` aren't
+  createOverrideForReadOnlyContructor( THREE.PerspectiveCamera, { position : { y : 40, z : 250 } } )
+    ( 45, window.innerWidth / window.innerHeight, 0.1, 1000 )
 
-let renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+const renderer = createRendererForWindow()
 
-let controls = new THREE.OrbitControls( camera, renderer.domElement );
-// changes focal point of camera
-controls.target = new THREE.Vector3( 0, 80, 0 )
+const focalPoint = [ 0, 80, 0 ]
+const controls = createCameraControlsWithFocalPoint(camera, renderer, focalPoint)
 
 
-// let gridHelper = new THREE.GridHelper( 200, 10 ); //size and step
-// scene.add( gridHelper );
-
-let ground = new THREE.PlaneBufferGeometry( 200, 200 );
-let groundMaterial = new THREE.MeshBasicMaterial( {color: "blue", side: THREE.DoubleSide} );
+const ground = new THREE.PlaneBufferGeometry( 200, 200 );
+const groundMaterial = new THREE.MeshBasicMaterial( {color: "blue", side: THREE.DoubleSide} );
 let plane = new THREE.Mesh( ground, groundMaterial );
 
 // plane.position.y = - 250;
@@ -87,10 +84,11 @@ Object.keys(colorList).forEach(function(key) {
 });
 
 
-let MIN = 2, MAX = 6;
-let minRadius = 0.3;
+const MIN = 2;
+const MAX = 6;
+const MIN_RADIUS = 0.3;
 
-let lengthFunction = lengthChooser(MIN, MAX);
+const chooseRandomLength = createLengthChooserWithMinAndMax(MIN, MAX);
 
 function render() {
     requestAnimationFrame( render );
@@ -151,7 +149,7 @@ let treeData = [{
 
 function createSegment(treeSegment) {
 
-  if (treeSegment.radius < minRadius) {
+  if (treeSegment.radius < MIN_RADIUS) {
     return;
   }
 
@@ -163,8 +161,7 @@ function createSegment(treeSegment) {
   let materialIndex = Math.min(Math.floor(treeSegment.radius), materials[treeSegment.color].length - 1 );
   let material = materials[treeSegment.color][materialIndex];
   let topRadius = treeSegment.radius * treeSegment.sizeReduction;
-  // console.log("radius old, new", treeSegment.radius, topRadius);
-  let length = lengthFunction();
+  let length = chooseRandomLength();
 
   let geometry = new THREE.CylinderGeometry(
     topRadius,
