@@ -2,7 +2,7 @@ import { createLengthChooserWithMinAndMax } from './higher-order'
 import * as ColorLists                      from './color-lists'
 import { Pink as PinkSpotlight }            from './lighting/spotlights'
 import { Purple as PurpleSky }              from './lighting/skies'
-import { beginCreatingSegments }            from './segment-creator'
+import { beginCreatingSegments }            from './creators/segment-creator'
 import {
   createCameraControlsWithFocalPoint,
   createMaterialListFromColorList,
@@ -53,10 +53,8 @@ const startRenderRunLoop = function render () {
 }
 
 const initializeEachSegment = segments => {
-  const colors = [ ]
 
   segments.forEach(segment => {
-    colors.push(segment.color)
 
     beginCreatingSegments({
       lengthProducer : createLengthChooserWithMinAndMax(2, 6),
@@ -67,7 +65,6 @@ const initializeEachSegment = segments => {
     })
   })
 
-  console.info('Segment colors used:', colors)
 }
 
 const onWindowResize = () => {
