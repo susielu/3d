@@ -1,14 +1,14 @@
 {
   "name": "3d-recursive-plantae",
-  "version": "1.0.0-experimental.0",
+  "version": "1.0.0-experimental.1",
   "description": "An exploration of how a plant's branching patterns makes it unique",
   "private": true,
   "main": "index.js",
   "scripts": {
-    "bundle"  : "browserify index.js -t babelify -t uglifyify -o bundle.js",
-    "lint"    : "eslint ./src && jscs ./src",
-    "start"   : "babel-node server.js",
-    "test"    : "mocha --compilers js:babel-register"
+    "bundle": "browserify index.js -t babelify -t uglifyify -o bundle.js",
+    "lint": "eslint ./src && jscs ./src",
+    "start": "babel-node server.js",
+    "test": "mocha --compilers js:babel-register"
   },
   "repository": {
     "type": "git",
