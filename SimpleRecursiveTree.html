@@ -13,10 +13,9 @@
         <script src="js/three.js"></script>
         <script src="js/orbitControls.js"></script>
         <script>
+            'use strict';
 
-            function lengthChooser(min, max) {
-              return function() { return Math.random()*(max - min) + min; };
-            }
+            const lengthChooser = (min, max) => () => Math.random()*(max - min) + min;
 
             var scene = new THREE.Scene();
             // scene.fog = new THREE.Fog( "#cce0ff", 500, 10000 );
@@ -27,6 +26,12 @@
 
             var renderer = new THREE.WebGLRenderer();
             renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMapType = THREE.PCFSoftShadowMap;
+            // renderer.gammaInput = true;
+            // renderer.gammaOutput = true;
+            // renderer.antialias = true;
+
             document.body.appendChild( renderer.domElement );
 
             var controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -37,8 +42,16 @@
             // var gridHelper = new THREE.GridHelper( 200, 10 ); //size and step
             // scene.add( gridHelper );
 
-            var ground = new THREE.PlaneBufferGeometry( 200, 200 );
-            var groundMaterial = new THREE.MeshBasicMaterial( {color: "blue", side: THREE.DoubleSide} );
+            var ground = new THREE.PlaneBufferGeometry( 2000, 2000 );
+            // var groundMaterial = new THREE.MeshBasicMaterial( {color: "#42e873", side: THREE.DoubleSide} );
+
+            var groundMaterial = new THREE.MeshStandardMaterial( {
+                  color: "#07b63a",
+                  emissive: "#343991",
+                  roughness: 1,
+                  metalness: 0,
+                  emissiveIntensity: 1
+                })
             var plane = new THREE.Mesh( ground, groundMaterial );
 
             // plane.position.y = - 250;
@@ -48,20 +61,66 @@
 
 
             // Lights
-            var lights = [];
-            lights[ 0 ] = new THREE.PointLight( "#fff", 1, 0 );
-            lights[ 1 ] = new THREE.PointLight( "#fff", 1, 0 );
-            lights[ 2 ] = new THREE.PointLight( "#fff", 1, 0 );
+            // var lights = [];
+            // lights[ 0 ] = new THREE.PointLight( "#fff", 1, 0 );
+            // lights[ 1 ] = new THREE.PointLight( "#fff", 1, 0 );
+            // lights[ 2 ] = new THREE.PointLight( "#fff", 1, 0 );
 
-            lights[ 0 ].position.set( 0, 300, 0 );
-            lights[ 1 ].position.set( 500, 300, 200 );
-            lights[ 2 ].position.set( - 200, - 500, - 200 );
+            // lights[ 0 ].position.set( 0, 300, 0 );
+            // lights[ 1 ].position.set( 300, 300, 200 );
+            // lights[ 2 ].position.set( -200, -500, -200 );
 
-            // scene.add( lights[ 0 ] );
-            scene.add( lights[ 1 ] );
-            scene.add( lights[ 2 ] );
+            // lights.map(l => {
+            //   l.castShadow = true;
+            //   // l.shadowDarkness = .5;
+            //   return l
+            // })
 
+            // // scene.add( lights[ 0 ] );
+            // scene.add( lights[ 1 ] );
+            // //scene.add( lights[ 2 ] );
 
+            var light = new THREE.DirectionalLight("#4444cc", 1)
+              light.position.set( 100, 100, 1 ).normalize();
+
+              scene.add( light );
+            // var spt = new THREE.SpotLight(0xFFFFFF);
+            var spt = new THREE.SpotLight("#fff9b5");
+
+            spt.position.set(200, 200, 40);
+            spt.castShadow = true;
+            spt.angle = 0.75;
+            spt.exponent = 10.0;
+            spt.penumbra = 0.1;
+            spt.decay = 1;
+            spt.distance = 1000;
+            spt.shadow.mapSize.width = 1024;
+            spt.shadow.mapSize.height = 1024;
+            // shadow camera helper
+            spt.shadowCameraHelper = new THREE.CameraHelper( spt.shadow.camera ); // colored lines
+            spt.shadow.camera.near = 0.1;
+            spt.shadow.camera.far = 20000;
+
+            // var spotLight = new THREE.SpotLight( "white", 10, 100 );
+
+            // spotLight.position.set( 100, 1000, 100 );
+
+            // spotLight.castShadow = true;
+
+            // spotLight.shadow.mapSize.width = 1024;
+            // spotLight.shadow.mapSize.height = 1024;
+
+            // spotLight.shadow.camera.near = 500;
+            // spotLight.shadow.camera.far = 4000;
+            // spotLight.shadow.camera.fov = 30;
+            //  // spotLight.target.position.set( 100, 100, 1 );
+            //   // spotLight.shadowCameraNear  = 0.01;
+            //   // spotLight.castShadow    = true;
+
+            //   // spotLight.shadowDarkness  = 0.5;
+            //   // spotLight.shadowCameraVisible = true;
+
+            scene.add( spt );
 
             //Colors
             var colorList = {
@@ -198,6 +257,8 @@
               cylinder.rotation.x = treeSegment.rotation.x;
               cylinder.rotation.y = treeSegment.rotation.y;
               cylinder.rotation.z = treeSegment.rotation.z;
+              cylinder.castShadow = true;
+              cylinder.receiveShadow = true;
 
               scene.add(cylinder);
 
