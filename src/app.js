@@ -30,6 +30,8 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const focalPoint = [ 0, 80, 0 ]
 const controls = createCameraControlsWithFocalPoint(camera, renderer, focalPoint)
 
+let segmentList = [];
+
 
 const plane = createPlane({
   mesh      : { color : "#07b63a", emissive: "#343991" },
@@ -38,11 +40,18 @@ const plane = createPlane({
 
 scene.add(plane)
 
-
-
 const renderOnce = () => {
   renderer.render( scene, camera );
   controls.update();
+
+  segmentList.forEach( function(segment) {
+    debugger;
+    if(segment.scale.x < 1) {
+      segment.scale.x +=0.005;
+      segment.scale.y +=0.005;
+      segment.scale.z +=0.005;
+    }
+  });
 }
 
 const startRenderRunLoop = function render () {
@@ -62,7 +71,8 @@ const initializeEachSegment = segments => {
       scene,
       segment,
       minimumRadius  : 0.3,
-      leafThreshold  : 1
+      leafThreshold  : 1,
+      segmentList: segmentList
     })
   })
 
