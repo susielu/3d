@@ -20,7 +20,7 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
     topRadius,
     segment.radius,
     length,
-    10
+    7
   );
 
   if (segment.radius < leafThreshold){
@@ -41,6 +41,8 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
   cylinder.rotation.x = segment.rotation.x;
   cylinder.rotation.y = segment.rotation.y;
   cylinder.rotation.z = segment.rotation.z;
+  cylinder.castShadow = true;
+  cylinder.receiveShadow = true;
 
   scene.add(cylinder);
 

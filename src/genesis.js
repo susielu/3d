@@ -41,6 +41,8 @@ export const createRendererForWindow = (someWindow = window) => {
 
 // Create, spread & use a 2-dimensional object to assign to a read-only namespace
 export const createOverrideForReadOnlyContructor = ( Contructor, override ) =>
+
+  //TODO: This type of function is confusing to me
   ( ...argumentsToSpread ) =>
     Object.keys(override).reduce(( instance, key1 ) => {
       if (typeof override[key1] === 'object')
@@ -50,9 +52,12 @@ export const createOverrideForReadOnlyContructor = ( Contructor, override ) =>
       else
         instance[key1] = override[key1]
 
+
+      // console.log('instance', instance, Contructor, override)
       return instance
     }, new Contructor( ...argumentsToSpread ))
 
+//TODO: This type of function is confusing to me
 export const createOverrideContructor =  createOverrideForReadOnlyContructor
 
 export const createPlane = ({ mesh, geometry }) => {
@@ -65,8 +70,16 @@ export const createPlane = ({ mesh, geometry }) => {
       emissiveIntensity: 1
     } );
 
-  return createOverrideContructor( THREE.Mesh, { rotation : { x : - Math.PI / 2 }, receiveShadow : true } )
-      ( ground, groundMaterial )
+
+  let plane = new THREE.Mesh( ground, groundMaterial );
+
+  plane.rotation.x = - Math.PI / 2;
+  plane.receiveShadow = true;
+  return plane;
+
+  //TODO: the added properties don't seem to be working
+  // return createOverrideContructor( THREE.Mesh, { rotation : { x : - Math.PI / 2 }, receiveShadow : true } )
+  //     ( ground, groundMaterial )
 }
 
 export const createSpotlight = (options) => {

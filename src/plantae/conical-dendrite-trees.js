@@ -36,7 +36,7 @@ export default [{
     rotation: new THREE.Vector3(0,  1,  0),
     color: 'blue'
 },{
-    radius: 7,
+    radius: 10,
     sizeReduction: .92,
     branchProbability: 0.12,
     position: new THREE.Vector3(-15, 0, 15),
