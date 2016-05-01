@@ -45,8 +45,22 @@ const renderOnce = () => {
   renderer.render( scene, camera );
   controls.update();
 
-  transitions = transitions.map(t => t());
+  let newTransitions = [];
+  transitions = transitions.map(t => {
+    var result = t;
+    if (typeof t === "function"){
+      return result();
+    } else {
+      newTransitions = newTransitions.concat(result.new);
+
+      return result.func();
+    }
+  });
+  transitions = transitions.concat(newTransitions);
+
   transitions = transitions.filter(t => t);
+
+  console.log('transitions', transitions)
 }
 
 //time in seconds
@@ -60,7 +74,7 @@ const scaleY = (object, property, time, onEnd, end=1, initial=0.1) => {
     }
 
     if (object[property].y >= end){
-      return onEnd();
+      return onEnd()
     }
 
     return scaling;
