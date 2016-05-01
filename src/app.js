@@ -15,6 +15,7 @@ import {
 
 // Using `require` to facillitate hot module replacement (import ~= const * = require(*))
 let conicalDendriteTreeSegments = require('./plantae/conical-dendrite-trees').default // this is saved for reloading
+let transitions = [];
 
 const scene = new THREE.Scene();
 
@@ -43,6 +44,29 @@ scene.add(plane)
 const renderOnce = () => {
   renderer.render( scene, camera );
   controls.update();
+
+  transitions = transitions.map(t => t());
+  transitions = transitions.filter(t => t);
+}
+
+//time in seconds
+const scaleY = (object, property, time, onEnd, end=1, initial=0.1) => {
+  var increment = (end - initial)/(time*60);
+
+  var scaling = () => {
+
+    if (object[property].y < end){
+      object[property].y += increment;
+    }
+
+    if (object[property].y >= end){
+      return onEnd();
+    }
+
+    return scaling;
+  }
+
+  return scaling;
 }
 
 const startRenderRunLoop = function render () {
@@ -54,17 +78,18 @@ const startRenderRunLoop = function render () {
 
 const initializeEachSegment = segments => {
 
-  segments.forEach(segment => {
-
-    beginCreatingSegments({
+  transitions = transitions.concat( segments.map(segment => {
+    return beginCreatingSegments({
       lengthProducer : createLengthChooserWithMinAndMax(2, 6),
       materials      : createMaterialListFromColorList(ColorLists.BlueToPink),
       scene,
       segment,
       minimumRadius  : 0.3,
-      leafThreshold  : 1
+      leafThreshold  : 1,
+      transition: scaleY,
+      transitions
     })
-  })
+  }))
 
 }
 

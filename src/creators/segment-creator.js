@@ -1,7 +1,6 @@
 import { createLeaf }            from './leaf-creator'
 
-const createSegment = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold }) {
-
+const createSegment = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition, transitions }) {
   if (segment.radius < minimumRadius) {
     return;
   }
@@ -43,6 +42,9 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
   cylinder.rotation.z = segment.rotation.z;
   cylinder.castShadow = true;
   cylinder.receiveShadow = true;
+  // cylinder.scale.x = 1;
+  cylinder.scale.y = 0.1;
+  // cylinder.scale.z = 1;
 
   scene.add(cylinder);
 
@@ -61,9 +63,11 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
 
   newRecursiveSegment.position.add(updateVector);
 
-  createSegment({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius, leafThreshold });
+  const onEnd = () => {
+    return createSegment({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius, leafThreshold, transition, transitions })
+  };
 
-  if (Math.random() < newRecursiveSegment.branchProbability) {
+ if (Math.random() < newRecursiveSegment.branchProbability) {
 
     let newBranchSegment = Object.assign({}, segment);
     newBranchSegment.position = localPosition;
@@ -74,8 +78,16 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
     newBranchSegment.rotation.normalize();
 
     // TODO: update position due to rotation effects here?
-    createSegment({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold });
+    transitions.push(createSegment({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold, transition, transitions }))
+
+    // createSegment({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold });
   }
+
+
+  return transition(cylinder, 'scale', .1, onEnd);
+
+
+
 }
 
 export { createSegment as beginCreatingSegments }
