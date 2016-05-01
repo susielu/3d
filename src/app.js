@@ -43,28 +43,32 @@ const renderOnce = () => {
   renderer.render( scene, camera );
   controls.update();
 
-  let newTransitions = [];
-  transitions = transitions.map(t => {
-    var result = t;
-    if (typeof t === "function"){
-      return result();
-    } else {
-      newTransitions = newTransitions.concat(result.new);
+  transitions.forEach( (objectTransitions, i) => {
 
-      return result.func();
+    if (objectTransitions.length !== 0){
+      const result = objectTransitions[0];
+
+      if (typeof result === "function"){
+        objectTransitions[0] = result();
+      } else {
+
+        objectTransitions = objectTransitions.concat(result.new);
+
+        objectTransitions[0] = result.func();
+      }
+
+      transitions[i] = objectTransitions.filter(t => t);
+
     }
-  });
 
-  //add any new transitions (branches)
-  transitions = transitions.concat(newTransitions);
+  })
 
-  //remove finished transitions
-  transitions = transitions.filter(t => t);
+  transitions = transitions.filter(t => t.length !== 0)
 }
 
 //time in seconds
 const scaleY = (object, property, onEnd, end=1, initial=0.1) => {
-  var increment = .5;
+  var increment = .4;
 
   var scaling = () => {
     if (object[property].y < end){
@@ -92,7 +96,7 @@ const startRenderRunLoop = function render () {
 const initializeEachSegment = segments => {
 
   transitions = transitions.concat( segments.map(segment => {
-    return beginCreatingSegments({
+    return [ beginCreatingSegments({
       lengthProducer : createLengthChooserWithMinAndMax(2, 6),
       materials      : createMaterialListFromColorList(ColorLists.BlueToPink),
       scene,
@@ -101,7 +105,7 @@ const initializeEachSegment = segments => {
       leafThreshold  : 1,
       transition: scaleY,
       transitions
-    })
+    }) ]
   }))
 
 }

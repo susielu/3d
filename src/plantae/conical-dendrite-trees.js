@@ -1,4 +1,5 @@
-export default [{
+export default [
+{
     radius: 6,
     sizeReduction: .85,
     branchProbability: 0.12,
@@ -35,10 +36,11 @@ export default [{
     position: new THREE.Vector3(-20, 0, -25),
     rotation: new THREE.Vector3(0,  1,  0),
     color: 'blue'
-},{
+},
+{
     radius: 10,
     sizeReduction: .9,
-    branchProbability: 0.17,
+    branchProbability: 0.16,
     position: new THREE.Vector3(-15, 0, 15),
     rotation: new THREE.Vector3(0,  1,  0),
     color: 'pink'

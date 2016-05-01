@@ -70,9 +70,9 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
     let newBranchSegment = Object.assign({}, segment);
     newBranchSegment.position = localPosition;
     newBranchSegment.rotation = localRotation;
-    newBranchSegment.rotation.x += Math.random() - 0.5;
-    newBranchSegment.rotation.y += Math.random() - 0.5;
-    newBranchSegment.rotation.z += Math.random() - 0.5;
+    newBranchSegment.rotation.x += 2 *( Math.random() - 0.5 );
+    newBranchSegment.rotation.y += 2 *( Math.random() - 0.5 );
+    newBranchSegment.rotation.z += 2 *( Math.random() - 0.5 );
     newBranchSegment.rotation.normalize();
 
     // TODO: update position due to rotation effects here?
