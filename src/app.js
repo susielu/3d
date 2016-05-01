@@ -59,8 +59,6 @@ const renderOnce = () => {
   transitions = transitions.concat(newTransitions);
 
   transitions = transitions.filter(t => t);
-
-  console.log('transitions', transitions)
 }
 
 //time in seconds
