@@ -39,8 +39,6 @@ const plane = createPlane({
 
 scene.add(plane)
 
-
-
 const renderOnce = () => {
   renderer.render( scene, camera );
   controls.update();
@@ -56,21 +54,24 @@ const renderOnce = () => {
       return result.func();
     }
   });
+
+  //add any new transitions (branches)
   transitions = transitions.concat(newTransitions);
 
+  //remove finished transitions
   transitions = transitions.filter(t => t);
 }
 
 //time in seconds
-const scaleY = (object, property, time, onEnd, end=1, initial=0.1) => {
-  var increment = (end - initial)/(time*60);
+const scaleY = (object, property, onEnd, end=1, initial=0.1) => {
+  var increment = .5;
 
   var scaling = () => {
-
     if (object[property].y < end){
       object[property].y += increment;
     }
 
+    //continues to call itself until end, then goes to get next transition
     if (object[property].y >= end){
       return onEnd()
     }

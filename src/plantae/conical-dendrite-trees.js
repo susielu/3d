@@ -31,14 +31,14 @@ export default [{
 },{
     radius: 7,
     sizeReduction: .82,
-    branchProbability: 0.22,
+    branchProbability: 0.27,
     position: new THREE.Vector3(-20, 0, -25),
     rotation: new THREE.Vector3(0,  1,  0),
     color: 'blue'
 },{
     radius: 10,
     sizeReduction: .9,
-    branchProbability: 0.12,
+    branchProbability: 0.17,
     position: new THREE.Vector3(-15, 0, 15),
     rotation: new THREE.Vector3(0,  1,  0),
     color: 'pink'

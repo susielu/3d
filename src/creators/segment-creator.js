@@ -19,7 +19,7 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
     topRadius,
     segment.radius,
     length,
-    7
+    5
   );
 
   if (segment.radius < leafThreshold){
@@ -65,8 +65,6 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
     return createSegment({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius, leafThreshold, transition })
   };
 
-  //return transition(cylinder, 'scale', .1, onEnd)
-
   if (Math.random() < newRecursiveSegment.branchProbability) {
 
     let newBranchSegment = Object.assign({}, segment);
@@ -79,11 +77,11 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
 
     // TODO: update position due to rotation effects here?
    return {
-      func: transition(cylinder, 'scale', .1, onEnd),
+      func: transition(cylinder, 'scale', onEnd),
       new: [createSegment({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold, transition })]
     }
   } else {
-      return transition(cylinder, 'scale', .1, onEnd);
+      return transition(cylinder, 'scale', onEnd);
   }
 
 }
