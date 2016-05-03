@@ -5,10 +5,9 @@ export default [
     branchProbability: 0.12,
     position: new THREE.Vector3(0, 0, 0),
     rotation: new THREE.Vector3(0, 1, 0),
-    color: 'blue'
-}
-
-, {
+    color: 'blue',
+    type: 'default'
+}/*, {
     radius: 3,
     sizeReduction: .87,
     branchProbability: 0.25,
@@ -52,4 +51,5 @@ export default [
     rotation: new THREE.Vector3(0,  1,  0),
     color: 'pink'
 }
+*/
 ];

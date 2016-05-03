@@ -96,6 +96,8 @@ const startRenderRunLoop = function render () {
 const initializeEachSegment = segments => {
 
   transitions = transitions.concat( segments.map(segment => {
+    console.log(segment.type);
+
     return [ beginCreatingSegments({
       lengthProducer : createLengthChooserWithMinAndMax(2, 6),
       materials      : createMaterialListFromColorList(ColorLists.BlueToPink),
@@ -104,7 +106,8 @@ const initializeEachSegment = segments => {
       minimumRadius  : 0.3,
       leafThreshold  : 1,
       transition: scaleY,
-      transitions
+      transitions,
+      segmentType: segment.type
     }) ]
   }))
 

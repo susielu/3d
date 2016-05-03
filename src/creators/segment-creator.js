@@ -1,6 +1,11 @@
 import { createLeaf }            from './leaf-creator'
 
-const createSegment = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition }) {
+
+const droopySegmentCreator = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition }) {
+  debugger;
+};
+
+const defaultSegmentCreator = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition }) {
   if (segment.radius < minimumRadius) {
     return;
   }
@@ -37,9 +42,9 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
   cylinder.position.y = localPosition.y;
   cylinder.position.z = localPosition.z;
 
-  cylinder.rotation.x = segment.rotation.x;
-  cylinder.rotation.y = segment.rotation.y;
-  cylinder.rotation.z = segment.rotation.z;
+  cylinder.rotation.x = localRotation.x;
+  cylinder.rotation.y = localRotation.y
+  cylinder.rotation.z = localRotation.z
   cylinder.castShadow = true;
   cylinder.receiveShadow = true;
   cylinder.scale.y = 0.1;
@@ -62,28 +67,37 @@ const createSegment = function ({ lengthProducer, materials, scene, segment, min
   newRecursiveSegment.position.add(updateVector);
 
   const onEnd = () => {
-    return createSegment({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius, leafThreshold, transition })
+    return defaultSegmentCreator({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius, leafThreshold, transition })
   };
 
   if (Math.random() < newRecursiveSegment.branchProbability) {
-
     let newBranchSegment = Object.assign({}, segment);
     newBranchSegment.position = localPosition;
     newBranchSegment.rotation = localRotation;
-    newBranchSegment.rotation.x += 2 *( Math.random() - 0.5 );
-    newBranchSegment.rotation.y += 2 *( Math.random() - 0.5 );
-    newBranchSegment.rotation.z += 2 *( Math.random() - 0.5 );
+    newBranchSegment.rotation.x += Math.random() > 0.5 ? Math.PI : -Math.PI
+    newBranchSegment.rotation.y += Math.random() > 0.5 ? Math.PI : -Math.PI
+    newBranchSegment.rotation.z += Math.random() > 0.5 ? Math.PI : -Math.PI
     newBranchSegment.rotation.normalize();
 
     // TODO: update position due to rotation effects here?
    return {
       func: transition(cylinder, 'scale', onEnd),
-      new: [createSegment({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold, transition })]
+      new: [defaultSegmentCreator({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold, transition })]
     }
   } else {
       return transition(cylinder, 'scale', onEnd);
   }
 
 }
+
+const creatorMap = {
+  default: defaultSegmentCreator,
+  droopy: droopySegmentCreator
+}
+
+const createSegment = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition, segmentType }) {
+  return creatorMap[segmentType]({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition });
+};
+
 
 export { createSegment as beginCreatingSegments }
