@@ -24,7 +24,7 @@ const camera =
   createOverrideForReadOnlyContructor( THREE.PerspectiveCamera, { position : { y : 40, z : 250 }, focus : 100 } )
     ( 45, window.innerWidth / window.innerHeight, 0.1, 2000000 )
 
-let renderer = createRendererForWindow() // `let` instead of `const` for reloading
+let renderer = createRendererForWindow(document.getElementById('container')) // `let` instead of `const` for reloading
 renderer.shadowMap.endabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 

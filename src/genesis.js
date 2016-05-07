@@ -29,12 +29,13 @@ export const createCameraControlsWithFocalPoint = (camera, renderer, focalPoint)
   return controls
 }
 
-export const createRendererForWindow = (someWindow = window) => {
+export const createRendererForWindow = (element, someWindow = window) => {
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize( someWindow.innerWidth, someWindow.innerHeight );
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  someWindow.document.body.appendChild( renderer.domElement );
+  element.appendChild( renderer.domElement )
+  //someWindow.document.body.appendChild( renderer.domElement );
 
   return renderer
 }

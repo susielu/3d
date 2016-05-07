@@ -40,7 +40,7 @@ export default [
 {
     radius: 10,
     sizeReduction: .9,
-    branchProbability: 0.16,
+    branchProbability: 0.2,
     position: new THREE.Vector3(-15, 0, 15),
     rotation: new THREE.Vector3(0,  1,  0),
     color: 'pink'
