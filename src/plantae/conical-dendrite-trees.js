@@ -6,8 +6,8 @@ export default [
     position: new THREE.Vector3(0, 0, 0),
     rotation: new THREE.Vector3(0, 1, 0),
     color: 'blue',
-    type: 'default'
-}/*, {
+    type: 'droopy'
+}, {
     radius: 3,
     sizeReduction: .87,
     branchProbability: 0.25,
@@ -51,5 +51,4 @@ export default [
     rotation: new THREE.Vector3(0,  1,  0),
     color: 'pink'
 }
-*/
 ];

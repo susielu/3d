@@ -1,11 +1,25 @@
 import { createLeaf }            from './leaf-creator'
 
+const defaultAngleChanger = function(angle) {
+  let newRotation = new THREE.Vector3();
+  newRotation.copy(angle);
+  newRotation.x += Math.random() > 0.5 ? Math.PI : -Math.PI
+  newRotation.y += Math.random() > 0.5 ? Math.PI : -Math.PI
+  newRotation.z += Math.random() > 0.5 ? Math.PI : -Math.PI
+  newRotation.normalize();
+  return newRotation;
+}
 
-const droopySegmentCreator = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition }) {
-  debugger;
-};
+const droopyAngleChanger = function(angle) {
+  let newRotation = new THREE.Vector3();
+  newRotation.copy(angle);
+  newRotation.x += Math.random() > 0.5 ? Math.PI : -Math.PI
+  newRotation.z += Math.random() > 0.5 ? Math.PI : -Math.PI
+  newRotation.normalize();
+  return newRotation;
+}
 
-const defaultSegmentCreator = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition }) {
+const defaultSegmentCreator = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition, angleChanger }) {
   if (segment.radius < minimumRadius) {
     return;
   }
@@ -53,8 +67,8 @@ const defaultSegmentCreator = function ({ lengthProducer, materials, scene, segm
 
   let newRecursiveSegment = Object.assign({}, segment);
   newRecursiveSegment.radius = topRadius;
-  newRecursiveSegment.position = localPosition;
-  newRecursiveSegment.rotation = localRotation;
+  newRecursiveSegment.position.copy(localPosition);
+  newRecursiveSegment.rotation.copy(localRotation);
 
   let updateVector = new THREE.Vector3(0,1,0);
   let rotationMatrix = new THREE.Matrix4();
@@ -67,22 +81,18 @@ const defaultSegmentCreator = function ({ lengthProducer, materials, scene, segm
   newRecursiveSegment.position.add(updateVector);
 
   const onEnd = () => {
-    return defaultSegmentCreator({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius, leafThreshold, transition })
+    return defaultSegmentCreator({ lengthProducer, materials, scene, segment : newRecursiveSegment, minimumRadius, leafThreshold, transition, angleChanger })
   };
 
   if (Math.random() < newRecursiveSegment.branchProbability) {
     let newBranchSegment = Object.assign({}, segment);
     newBranchSegment.position = localPosition;
-    newBranchSegment.rotation = localRotation;
-    newBranchSegment.rotation.x += Math.random() > 0.5 ? Math.PI : -Math.PI
-    newBranchSegment.rotation.y += Math.random() > 0.5 ? Math.PI : -Math.PI
-    newBranchSegment.rotation.z += Math.random() > 0.5 ? Math.PI : -Math.PI
-    newBranchSegment.rotation.normalize();
+    newBranchSegment.rotation = angleChanger(localRotation);
 
     // TODO: update position due to rotation effects here?
    return {
       func: transition(cylinder, 'scale', onEnd),
-      new: [defaultSegmentCreator({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold, transition })]
+      new: [defaultSegmentCreator({ lengthProducer, materials, scene, segment : newBranchSegment, minimumRadius, leafThreshold, transition, angleChanger })]
     }
   } else {
       return transition(cylinder, 'scale', onEnd);
@@ -90,13 +100,12 @@ const defaultSegmentCreator = function ({ lengthProducer, materials, scene, segm
 
 }
 
-const creatorMap = {
-  default: defaultSegmentCreator,
-  droopy: droopySegmentCreator
-}
-
 const createSegment = function ({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition, segmentType }) {
-  return creatorMap[segmentType]({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition });
+  if (segmentType == 'droopy') {
+    return defaultSegmentCreator({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition, angleChanger: droopyAngleChanger });
+  } else {
+    return defaultSegmentCreator({ lengthProducer, materials, scene, segment, minimumRadius, leafThreshold, transition, angleChanger: defaultAngleChanger });
+  }
 };
 
 
