@@ -12,6 +12,7 @@ import {
   createSpotlight,
   createRendererForWindow                 } from './genesis'
 
+const OVERLAY = "#overlay";
 
 // Using `require` to facillitate hot module replacement (import ~= const * = require(*))
 let conicalDendriteTreeSegments = require('./plantae/conical-dendrite-trees').default // this is saved for reloading
@@ -19,10 +20,15 @@ let transitions = [];
 
 const scene = new THREE.Scene();
 
-const camera =
-  // `PerspectiveCamera.position` is read only but it's fields `y` and `z` aren't
-  createOverrideForReadOnlyContructor( THREE.PerspectiveCamera, { position : { y : 40, z : 250 }, focus : 100 } )
-    ( 45, window.innerWidth / window.innerHeight, 0.1, 2000000 )
+// const camera =
+//   // `PerspectiveCamera.position` is read only but it's fields `y` and `z` aren't
+//   createOverrideForReadOnlyContructor( THREE.PerspectiveCamera, { position : { y : 40, z : 250 }, focus : 100 } )
+//     ( 45, window.innerWidth / window.innerHeight, 0.1, 2000000 )
+
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000000 );
+camera.position.z = 250;
+camera.position.y = 120;
+camera.focus = 100;
 
 let renderer = createRendererForWindow(document.getElementById('container')) // `let` instead of `const` for reloading
 renderer.shadowMap.endabled = true;
@@ -110,6 +116,16 @@ const initializeEachSegment = segments => {
 
 }
 
+//Overlay interactions
+//d3.select(OVERLAY)
+
+d3.select("#zoom-out")
+  .on('click', d => controls.dollyOut(5))
+
+d3.select("#zoom-in")
+  .on('click', d => controls.dollyIn(5))
+
+//Window resize and reload
 const onWindowResize = () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();

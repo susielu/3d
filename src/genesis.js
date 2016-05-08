@@ -34,8 +34,10 @@ export const createRendererForWindow = (element, someWindow = window) => {
   renderer.setSize( someWindow.innerWidth, someWindow.innerHeight );
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  element.appendChild( renderer.domElement )
-  //someWindow.document.body.appendChild( renderer.domElement );
+
+  if (document.getElementsByTagName('canvas').length === 0){
+      element.appendChild( renderer.domElement )
+  }
 
   return renderer
 }
