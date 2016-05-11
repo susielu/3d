@@ -11,11 +11,24 @@
 
   <title>3D Recursive Plantae</title>
   <link href="styles.css" type="text/css" rel="stylesheet">
-</head>
+<!-- <link href='https://fonts.googleapis.com/css?family=Raleway:200' rel='stylesheet' type='text/css'>
+ --></head>
 
 <body></body>
+<div id="container">
+  <div id="overlay">
+    <h1>Goodreads Gardens</h1>
+    <div id="zoom">
+      <button id="zoom-in"><img src="/img/plus.png"/></button>
+      <button id="zoom-out"><img src="/img/minus.png"/></button>
+      <button id="play"><img src="/img/play.png"/></button>
+      <button id="pause"><img src="/img/pause.png"/></button>
+    </div>
+  </div>
+</div>
 
 <script type="text/javascript" src="src/three.js"         ></script>
+<script type="text/javascript" src="src/d3.min.js"         ></script>
 <script type="text/javascript" src="src/orbitControls.js" ></script>
 
 <script type="x-shader/x-vertex" id="vertexShader">

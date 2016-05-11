@@ -29,36 +29,18 @@ export const createCameraControlsWithFocalPoint = (camera, renderer, focalPoint)
   return controls
 }
 
-export const createRendererForWindow = (someWindow = window) => {
+export const createRendererForWindow = (element, someWindow = window) => {
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize( someWindow.innerWidth, someWindow.innerHeight );
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  someWindow.document.body.appendChild( renderer.domElement );
+
+  if (document.getElementsByTagName('canvas').length === 0){
+      element.appendChild( renderer.domElement )
+  }
 
   return renderer
 }
-
-// Create, spread & use a 2-dimensional object to assign to a read-only namespace
-export const createOverrideForReadOnlyContructor = ( Contructor, override ) =>
-
-  //TODO: This type of function is confusing to me
-  ( ...argumentsToSpread ) =>
-    Object.keys(override).reduce(( instance, key1 ) => {
-      if (typeof override[key1] === 'object')
-        Object.keys( override[key1] ).forEach( key2 => {
-          instance[key1][key2] = override[key1][key2]
-        })
-      else
-        instance[key1] = override[key1]
-
-
-      // console.log('instance', instance, Contructor, override)
-      return instance
-    }, new Contructor( ...argumentsToSpread ))
-
-//TODO: This type of function is confusing to me
-export const createOverrideContructor =  createOverrideForReadOnlyContructor
 
 export const createPlane = ({ mesh, geometry }) => {
   const ground         = new THREE.PlaneBufferGeometry( geometry.width, geometry.height );
@@ -77,9 +59,6 @@ export const createPlane = ({ mesh, geometry }) => {
   plane.receiveShadow = true;
   return plane;
 
-  //TODO: the added properties don't seem to be working
-  // return createOverrideContructor( THREE.Mesh, { rotation : { x : - Math.PI / 2 }, receiveShadow : true } )
-  //     ( ground, groundMaterial )
 }
 
 export const createSpotlight = (options) => {

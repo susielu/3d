@@ -6,25 +6,30 @@ import { beginCreatingSegments }            from './creators/segment-creator'
 import {
   createCameraControlsWithFocalPoint,
   createMaterialListFromColorList,
-  createOverrideForReadOnlyContructor,
   createPlane,
   createSky,
   createSpotlight,
   createRendererForWindow                 } from './genesis'
 
+// State variables
+const OVERLAY = "#overlay";
+const ROWLENGTH = 5;
+let selectedTree;
+let pause = false;
 
 // Using `require` to facillitate hot module replacement (import ~= const * = require(*))
 let conicalDendriteTreeSegments = require('./plantae/conical-dendrite-trees').default // this is saved for reloading
-let transitions = [];
+let transitions = {
+  trees: {}
+};
 
 const scene = new THREE.Scene();
 
-const camera =
-  // `PerspectiveCamera.position` is read only but it's fields `y` and `z` aren't
-  createOverrideForReadOnlyContructor( THREE.PerspectiveCamera, { position : { y : 40, z : 250 }, focus : 100 } )
-    ( 45, window.innerWidth / window.innerHeight, 0.1, 2000000 )
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000000 );
+camera.position.y = 120;
+camera.focus = 100;
 
-let renderer = createRendererForWindow() // `let` instead of `const` for reloading
+let renderer = createRendererForWindow(document.getElementById('container')) // `let` instead of `const` for reloading
 renderer.shadowMap.endabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -43,27 +48,20 @@ const renderOnce = () => {
   renderer.render( scene, camera );
   controls.update();
 
-  transitions.forEach( (objectTransitions, i) => {
+  if (!pause && selectedTree !== undefined && transitions.trees[selectedTree].length !== 0){
 
-    if (objectTransitions.length !== 0){
-      const result = objectTransitions[0];
+    let objectTransitions = transitions.trees[selectedTree]
+    const result = objectTransitions[0];
 
-      if (typeof result === "function"){
-        objectTransitions[0] = result();
-      } else {
-
-        objectTransitions = objectTransitions.concat(result.new);
-
-        objectTransitions[0] = result.func();
-      }
-
-      transitions[i] = objectTransitions.filter(t => t);
-
+    if (typeof result === "function"){
+      objectTransitions[0] = result();
+    } else {
+      objectTransitions = objectTransitions.concat(result.new);
+      objectTransitions[0] = result.func();
     }
+    transitions.trees[selectedTree] = objectTransitions.filter(t => t);
 
-  })
-
-  transitions = transitions.filter(t => t.length !== 0)
+  }
 }
 
 //time in seconds
@@ -93,12 +91,13 @@ const startRenderRunLoop = function render () {
   return runLoopId
 }
 
-const initializeEachSegment = segments => {
+const initializeEachSegment = (segments, gridLength, plotSize) => {
+  const length = segments.length;
 
-  transitions = transitions.concat( segments.map(segment => {
-    console.log(segment.type);
+  segments.forEach((segment, i) => {
+    segment.position = new THREE.Vector3( -plotSize*gridLength/2 + plotSize*(i%gridLength) + plotSize/2 , 0, -plotSize*gridLength/2 + plotSize*(Math.floor(i/gridLength)) + plotSize/2)
 
-    return [ beginCreatingSegments({
+    transitions.trees[i] = [ beginCreatingSegments({
       lengthProducer : createLengthChooserWithMinAndMax(2, 6),
       materials      : createMaterialListFromColorList(ColorLists.BlueToPink),
       scene,
@@ -109,10 +108,24 @@ const initializeEachSegment = segments => {
       transitions,
       segmentType: segment.type
     }) ]
-  }))
+  })
 
 }
 
+//Overlay interactions
+d3.select("#zoom-out")
+  .on('click', () => controls.dollyOut(5))
+
+d3.select("#zoom-in")
+  .on('click', () => controls.dollyIn(5))
+
+d3.select("#pause")
+  .on('click', () => pause = true)
+
+d3.select("#play")
+  .on('click', () => pause = false)
+
+//Window resize and reload
 const onWindowResize = () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -127,7 +140,18 @@ const onDOMLoad = () => {
   scene.add( createSpotlight(PinkSpotlight) );
   scene.add( createSky(PurpleSky) );
 
-  initializeEachSegment(conicalDendriteTreeSegments)
+  //Create grid of trees
+  const PLOT = 100;
+  const GRIDLENGTH = Math.ceil(Math.sqrt(conicalDendriteTreeSegments.length));
+  var size = PLOT* GRIDLENGTH /2;
+  var step = PLOT;
+
+  camera.position.z = GRIDLENGTH*PLOT + 250;
+
+  var gridHelper = new THREE.GridHelper( size, step );
+  scene.add( gridHelper );
+
+  initializeEachSegment(conicalDendriteTreeSegments, GRIDLENGTH, PLOT)
   runLoopIdentifier = startRenderRunLoop()
 }
 

@@ -402,6 +402,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
     }
 
+    scope.dollyOut = dollyOut;
+    scope.dollyIn = dollyIn;
+
     //
     // event callbacks - update the object state
     //
