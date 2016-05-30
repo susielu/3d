@@ -30,7 +30,7 @@ camera.position.y = 120;
 camera.focus = 100;
 
 let renderer = createRendererForWindow(document.getElementById('container')) // `let` instead of `const` for reloading
-renderer.shadowMap.endabled = true;
+renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const focalPoint = [ 0, 80, 0 ]
